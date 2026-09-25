@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
@@ -340,13 +340,15 @@
         return;
       }
       const profileKey = `baeudaProfile:${user.uid}`;
-      if (localStorage.getItem('baeudaActiveProfileKey') !== profileKey) {
-        localStorage.setItem('baeudaActiveProfileKey', profileKey);
-        window.location.reload();
-        return;
-      }
+      localStorage.setItem('baeudaActiveProfileKey', profileKey);
       profileRef = doc(db, 'users', user.uid);
+      const cachedProfile = localStorage.getItem(profileKey);
+      if (cachedProfile) {
+        window.BAEUDADashboard.renderProfile(JSON.parse(cachedProfile));
+      }
+      const revealFallback = window.setTimeout(() => document.body.classList.remove('auth-pending'), 800);
       onSnapshot(profileRef, async snapshot => {
+        window.clearTimeout(revealFallback);
         if (!snapshot.exists()) {
           const profile = cleanProfile({ username: user.displayName || user.email.split('@')[0], displayName: user.displayName || user.email.split('@')[0], email: user.email });
           await setDoc(profileRef, { ...profile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
