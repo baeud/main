@@ -86,6 +86,7 @@ form.addEventListener('submit', async event => {
     } else {
       await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value);
     }
+    localStorage.setItem('baeudaActiveProfileKey', `baeudaProfile:${auth.currentUser.uid}`);
     showMessage('Berhasil. Membuka dashboard...', true);
     window.location.replace('dashboard.html');
   } catch (error) {
