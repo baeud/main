@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Mata Pelajaran - BAEUDA</title><link rel="stylesheet" href="styles.css" /></head>
+<body class="focus-page auth-pending">
+  <header class="focus-topbar"><a class="focus-brand" href="dashboard.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a><a class="small-btn" href="features.html">← Semua fitur</a></header>
+  <main class="focus-main">
+    <section class="focus-heading"><div><p class="eyebrow">Belajar sesuai minat</p><h1>Mata pelajaran.</h1><p>Pilih satu permainan, kerjakan dengan santai, dan lihat hasilnya bertambah di profilmu.</p></div></section>
+    <section class="focus-grid">
+      <a class="focus-card feature-card" href="quiz.html"><div class="focus-icon">⚡</div><h2>Fisika</h2><p>10 soal IPA Fisika dengan tingkat Easy, Medium, dan Hard.</p><span class="btn brand">Mulai kuis →</span></a>
+      <a class="focus-card feature-card" href="math-quiz.html"><div class="focus-icon">🔢</div><h2>Matematika</h2><p>Latihan hitung, pola, dan logika untuk mengasah cara berpikir.</p><span class="btn brand">Mulai latihan →</span></a>
+      <a class="focus-card feature-card" href="word-guess.html"><div class="focus-icon">🔤</div><h2>Bahasa</h2><p>Tebak kata edukatif dengan sesi singkat yang mudah diulang.</p><span class="btn brand">Main sekarang →</span></a>
+      <a class="focus-card feature-card" href="memory-game.html"><div class="focus-icon">🧠</div><h2>Pengetahuan Umum</h2><p>Latih ingatan dengan mencocokkan pasangan informasi penting.</p><span class="btn brand">Latih ingatan →</span></a>
+    </section>
+  </main>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => {});</script>
+</body>
+</html>

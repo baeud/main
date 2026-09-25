@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ruang Belajar - BAEUDA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="focus-page auth-pending">
+  <header class="focus-topbar">
+    <a class="focus-brand" href="dashboard.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a>
+    <a class="small-btn" href="dashboard.html">← Dashboard</a>
+  </header>
+  <main class="focus-main">
+    <section class="focus-heading"><div><p class="eyebrow">Pusat kendali belajar</p><h1>Ruang belajarmu.</h1><p>Masuk ke satu ruang pada satu waktu agar fokusmu tetap ringan dan progres lebih mudah terlihat.</p></div></section>
+    <div class="overview-banner"><strong id="overview-greeting">Selamat datang kembali.</strong><span>Pilih apa yang ingin kamu kerjakan hari ini.</span></div>
+    <section class="focus-grid" aria-label="Menu fitur belajar">
+      <a class="focus-card feature-card" href="subjects.html"><div class="focus-icon">⚡</div><h2>Mata Pelajaran</h2><p>Jelajahi Fisika, Matematika, Bahasa, dan Pengetahuan Umum.</p><span class="btn brand">Buka pelajaran →</span></a>
+      <a class="focus-card feature-card" href="tasks.html"><div class="focus-icon">✅</div><h2>Tugas & Misi</h2><p>Susun langkah kecil untuk menjaga ritme belajar harianmu.</p><span class="btn brand">Atur tugas →</span></a>
+      <a class="focus-card feature-card" href="tutor.html"><div class="focus-icon">🎓</div><h2>AI Tutor</h2><p>Tuliskan konsep yang ingin kamu pahami dan dapatkan arahan singkat.</p><span class="btn brand">Tanya tutor →</span></a>
+      <a class="focus-card feature-card" href="progress.html"><div class="focus-icon">🌱</div><h2>Progress & Achievement</h2><p>Lihat XP, level, streak, leaderboard, dan pencapaianmu.</p><span class="btn brand">Lihat progres →</span></a>
+    </section>
+  </main>
+  <script type="module">
+    import { requireAuth } from './auth-guard.js';
+    requireAuth(user => { document.getElementById('overview-greeting').textContent = `Hai, ${user.displayName || user.email}!`; });
+  </script>
+</body>
+</html>

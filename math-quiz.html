@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuis Matematika — BAEUDA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-pending">
+  <main class="container" style="max-width:700px;margin:40px auto;">
+    <div class="card" style="padding:2em;">
+      <div class="badge">Kuis Matematika</div>
+      <h3 style="margin-bottom:1em;">Soal Cerita Bilangan, Aljabar, dan Akar Pangkat</h3>
+      <div id="quiz-area">
+        <div id="quiz-question" style="font-size:1.1rem;margin-bottom:.8em;"></div>
+        <div id="quiz-options"></div>
+        <div id="quiz-feedback" style="margin-top:1em;min-height:2em;"></div>
+        <button class="btn brand" id="quiz-next" style="display:none;margin-top:1em;">Pertanyaan Berikutnya</button>
+        <div id="quiz-score" style="margin-top:1em;font-weight:600;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = localStorage.getItem('baeudaActiveProfileKey') || 'baeudaProfile';
+
+    function loadProfile() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : null;
+    }
+
+    function saveProfile(profile) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      window.dispatchEvent(new CustomEvent('baeuda-profile-updated', { detail: profile }));
+    }
+
+    function addQuizXP(amount) {
+      const defaultStats = [
+        { label: 'Permainan dimainkan', value: 0 },
+        { label: 'Tantangan selesai', value: 0 },
+        { label: 'XP didapat', value: 0 }
+      ];
+      const profile = loadProfile() || { xp: 0, level: 1, stats: defaultStats };
+      profile.xp = Number(profile.xp || 0) + amount;
+      profile.stats = Array.isArray(profile.stats) ? profile.stats : defaultStats;
+      if (!profile.stats[0]) profile.stats[0] = defaultStats[0];
+      if (!profile.stats[1]) profile.stats[1] = defaultStats[1];
+      if (!profile.stats[2]) profile.stats[2] = defaultStats[2];
+      profile.stats[0].value = Number(profile.stats[0].value || 0) + 1;
+      profile.stats[2].value = Number(profile.stats[2].value || 0) + amount;
+      profile.level = Math.max(1, Math.ceil(profile.xp / 100));
+      saveProfile(profile);
+    }
+
+    const quizQuestions = [
+      { level: 'Easy', q: 'Di suatu kelas, rata-rata nilai matematika dari 4 anak adalah 80. Ketika nilai satu anak lain ditambahkan, rata-rata nilai mereka menjadi 84. Jika nilai matematika anak kelima itu diminta, berapakah nilainya?', options: ['90', '96', '100', '84'], answer: 2, explain: 'Rata-rata 4 anak = 80 → nilai 4 anak = 80 × 4 = 320. Rata-rata 5 anak = 84 → nilai 5 anak = 84 × 5 = 420. Jadi nilai anak kelima adalah 420 - 320 = 100.', type: 'mc' },
+      { level: 'Easy', q: 'Pak Budi menuliskan bentuk aljabar 3x - 6y - 5x di papan tulis dan meminta siswa untuk menyederhanakannya. Bentuk paling sederhana dari ekspresi tersebut adalah....', options: ['-2x - 6y', '-2x + 6y', '8x - 6y', '2x - 6y'], answer: 0, explain: '3x dan 5x adalah sejenis, maka kedua bilangan tersebut dioperasikan terlebih dahulu: 3x - 5x = -2x. Jadi hasilnya adalah -2x - 6y.', type: 'mc' },
+      { level: 'Easy', q: 'Seorang siswa ingin menjumlahkan dua bentuk akar, yaitu 3√2 dan 5√2. Karena akar-akar tersebut memiliki basis yang sama, berapakah hasil penjumlahan yang benar?', options: ['8√2', '15√2', '√2', '8√4'], answer: 0, explain: 'Basis akarnya sudah sama, yaitu √2. Jadi 3√2 + 5√2 = (3 + 5)√2 = 8√2.', type: 'mc' },
+      { level: 'Medium', q: 'Pada hari ini, harga setengah kilogram cabe rawit adalah Rp35.000,00. Ibu membutuhkan cabe rawit seberat 2¼ kilogram untuk dimasak. Berapakah total harga yang harus dibayar ibu?', options: ['Rp 105.000,00', 'Rp 140.000,00', 'Rp 157.500,00', 'Rp 175.000,00'], answer: 2, explain: '½ kg = Rp35.000, jadi 1 kg = Rp70.000. ¼ kg = Rp17.500. 2 kg = Rp140.000, ¼ kg = Rp17.500, sehingga total = Rp157.500.', type: 'mc' },
+      { level: 'Medium', q: 'Umur seorang ayah sekarang adalah 3 kali umur anaknya. Sembilan tahun yang lalu, umur ayah itu adalah 5 kali umur anaknya. Jika umur mereka sekarang dicari, berapakah jumlah umur ayah dan anak tersebut saat ini?', options: ['54 tahun', '60 tahun', '72 tahun', '80 tahun'], answer: 2, explain: 'Umur anak sekarang = x, umur ayah = 3x. 9 tahun lalu: 3x - 9 = 5(x - 9). Selesaikan: 3x - 9 = 5x - 45 → 36 = 2x → x = 18. Anak = 18 tahun, ayah = 54 tahun. Jumlahnya = 72 tahun.', type: 'mc' },
+      { level: 'Medium', q: 'Sebuah lantai rumah berbentuk persegi memiliki luas 180 m². Di atas lantai itu diletakkan karpet berbentuk persegi dengan luas 80 m². Jika selisih panjang sisi lantai dan karpet dihitung, berapa selisihnya?', options: ['2√5 meter', '4√5 meter', '6√5 meter', '√5 meter'], answer: 0, explain: 'Panjang sisi lantai = √180 = √(36 × 5) = 6√5 m. Sisi karpet = √80 = √(16 × 5) = 4√5 m. Selisih = 6√5 - 4√5 = 2√5 m.', type: 'mc' },
+      { level: 'Medium', q: 'Ibu memiliki persediaan beras sebanyak 60 kg. Sebanyak 2/5 bagian dari beras tersebut dibagikan kepada tetangga, lalu 1/4 bagian dari sisanya dimasak untuk acara keluarga. Berapa sisa beras Ibu sekarang?', options: ['24 kg', '27 kg', '30 kg', '36 kg'], answer: 1, explain: 'Beras yang dibagikan ke tetangga = 2/5 × 60 = 24 kg. Sisa = 60 - 24 = 36 kg. Beras yang dimasak = 1/4 × 36 = 9 kg. Sisa akhir = 36 - 9 = 27 kg.', type: 'mc' },
+      { level: 'Hard', q: 'Umur Kakak sekarang 5 tahun lebih tua dari umur Adik. Jika jumlah umur mereka berdua adalah 25 tahun, berapakah umur Adik saat ini?', options: ['8 tahun', '9 tahun', '10 tahun', '12 tahun'], answer: 2, explain: 'Misal Adik = x, maka Kakak = x + 5. Persamaan: x + (x + 5) = 25 → 2x + 5 = 25 → 2x = 20 → x = 10 tahun.', type: 'mc' },
+      { level: 'Hard', q: 'Ibu membeli sekeranjang apel. Sebanyak 2/3 bagian apel dibagikan kepada tetangga, dan sisa apel yang masih ada di keranjang tinggal 8 buah. Berapa jumlah seluruh apel yang dibeli Ibu semula?', options: ['16', '20', '24', '30'], answer: 2, explain: 'Sisa apel = 1 - 2/3 = 1/3 bagian. 1/3 × total apel = 8, jadi total apel = 8 × 3 = 24 buah.', type: 'mc' },
+      { level: 'Hard', q: 'Sebuah bak mandi berbentuk kubus berisi penuh dengan volume 512 liter. Karena 1 liter sama dengan 1 dm³, berapakah tinggi bak mandi tersebut dalam satuan desimeter?', options: ['6 dm', '8 dm', '10 dm', '12 dm'], answer: 1, explain: 'Rumus volume kubus: V = s³. Mencari panjang rusuk/tinggi: s = ³√512 = 8 dm karena 8 × 8 × 8 = 512.', type: 'mc' }
+    ];
+    let idx=0, score=0;
+    function showQ(){
+      const q=quizQuestions[idx];
+      document.getElementById('quiz-question').innerHTML = `<div style="margin-bottom:.5em;"><span class="badge" style="display:inline-block;">Level ${q.level}</span></div><b>Pertanyaan ${idx+1}:</b> ${q.q}`;
+      if(q.type === "essay"){
+        document.getElementById('quiz-options').innerHTML = `<textarea id="essay-answer" class="input" rows="4" placeholder="Tulis jawabanmu di sini..."></textarea><br><button class="btn brand" onclick="answerEssay()">Kirim Jawaban</button>`;
+      } else {
+        document.getElementById('quiz-options').innerHTML = q.options.map((o,i)=>
+          `<button class="btn full" style="margin:.4em 0;text-align:left;" onclick="answer(${i})">${o}</button>`
+        ).join('');
+      }
+      document.getElementById('quiz-feedback').textContent='';
+      document.getElementById('quiz-next').style.display='none';
+      document.getElementById('quiz-score').textContent = `Pertanyaan ${idx+1} / ${quizQuestions.length}`;
+    }
+    window.answer = function(selected){
+      const q=quizQuestions[idx];
+      if(selected===q.answer){ score++; document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--ok)">Benar! 🎉</span>`; }
+      else { document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--danger)">Salah</span><br>Jawaban: <b>${q.options[q.answer]}</b><br><small>${q.explain}</small>`; }
+      document.getElementById('quiz-options').innerHTML='';
+      document.getElementById('quiz-next').style.display='inline-block';
+      document.getElementById('quiz-score').textContent = `Skor: ${score} / ${quizQuestions.length}`;
+    };
+    function normalizeAnswer(text){
+      return text.toLowerCase().replace(/[^0-9a-z]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    window.answerEssay = function(){
+      const q=quizQuestions[idx];
+      const userAnswer = normalizeAnswer(document.getElementById('essay-answer').value);
+      const correctAnswer = normalizeAnswer(q.answer);
+      const correctNumber = /\b2\b/.test(userAnswer) && /\b2\b/.test(correctAnswer);
+      if(correctNumber){ score++; document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--ok)">Benar! 🎉</span><br><small>${q.explain}</small>`; }
+      else { document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--danger)">Salah</span><br>Jawaban benar: <b>${q.answer}</b><br><small>${q.explain}</small>`; }
+      document.getElementById('quiz-options').innerHTML='';
+      document.getElementById('quiz-next').style.display='inline-block';
+      document.getElementById('quiz-score').textContent = `Skor: ${score} / ${quizQuestions.length}`;
+    };
+    document.getElementById('quiz-next').onclick = function(){
+      idx++;
+      if(idx < quizQuestions.length) showQ();
+      else {
+        addQuizXP(score * 10);
+        document.getElementById('quiz-area').innerHTML = `<h4>Kuis selesai!</h4><p>Skor akhir: <b>${score} / ${quizQuestions.length}</b></p><p>Kamu mendapat ${score * 10} XP!</p><a class="btn" href="index.html">Kembali ke Beranda</a>`;
+      }
+    };
+    showQ();
+  </script>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => {});</script>
+</body>
+</html>

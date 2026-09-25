@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>AI Tutor - BAEUDA</title><link rel="stylesheet" href="styles.css" /></head>
+<body class="focus-page auth-pending">
+  <header class="focus-topbar"><a class="focus-brand" href="dashboard.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a><a class="small-btn" href="features.html">← Semua fitur</a></header>
+  <main class="focus-main">
+    <section class="focus-heading"><div><p class="eyebrow">Teman belajar</p><h1>AI Tutor.</h1><p>Tulis konsep atau soal yang sedang membuatmu penasaran. Mulai dari satu pertanyaan kecil.</p></div></section>
+    <section class="focus-card focus-tutor"><div class="focus-icon">🎓</div><h2>Apa yang ingin kamu pahami?</h2><p>Gunakan kata-kata sendiri. Tutor akan membantumu memecah pertanyaan menjadi langkah yang lebih mudah.</p><form class="focus-form" id="tutor-form"><input id="tutor-question" placeholder="Contoh: Jelaskan gaya gravitasi" required /><button class="btn brand" type="submit">Tanya tutor</button></form><div id="tutor-answer" class="focus-answer">Halo! Aku siap membantu menjelaskan konsep belajar dengan bahasa yang singkat dan sederhana.</div></section>
+    <section class="focus-grid" style="margin-top:16px"><div class="focus-card"><h2>Tips bertanya</h2><ul class="focus-list"><li><span>1</span> Sebutkan topik yang belum dipahami.</li><li><span>2</span> Tambahkan contoh angka jika ada.</li><li><span>3</span> Minta penjelasan langkah demi langkah.</li></ul></div><div class="focus-card"><h2>Topik populer</h2><ul class="focus-list"><li><span>⚡</span> Energi dan gaya</li><li><span>🔢</span> Pecahan dan aljabar</li><li><span>🌱</span> Kebiasaan belajar</li></ul></div></section>
+  </main>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => { document.getElementById('tutor-form').addEventListener('submit', event => { event.preventDefault(); const question = document.getElementById('tutor-question').value.trim(); document.getElementById('tutor-answer').textContent = `Pertanyaan bagus tentang “${question}”. Pecah menjadi: apa yang diketahui, apa yang ditanya, dan rumus atau konsep apa yang cocok. Sekarang coba jelaskan kembali dengan satu contoh sederhana.`; }); });</script>
+</body>
+</html>

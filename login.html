@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Masuk - BAEUDA</title><link rel="stylesheet" href="styles.css" /></head>
+<body class="auth-page" data-auth-mode="login">
+  <main class="auth-layout">
+    <section class="auth-story"><div><a class="landing-brand" href="index.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a><div class="landing-kicker" style="margin-top:58px;">Selamat datang kembali</div><h1>Lanjutkan langkah kecilmu.</h1><p>Masuk ke ruang belajar personal untuk melanjutkan kuis, misi, dan progres yang sudah kamu mulai.</p></div><ul class="auth-story-list"><li><span>⚡</span> Latihan singkat yang terasa seru</li><li><span>🎯</span> Misi belajar yang terarah</li><li><span>🌱</span> Progres yang tersimpan untukmu</li></ul></section>
+    <section class="auth-panel"><div class="auth-panel-top"><a href="index.html">← Kembali ke BAEUDA</a><a href="register.html">Daftar</a></div><h2>Masuk ke akunmu</h2><p class="auth-panel-intro">Gunakan email dan kata sandi untuk kembali ke dashboard.</p><form id="auth-page-form" class="auth-page-form"><label>Email<input id="auth-page-email" type="email" autocomplete="email" placeholder="nama@email.com" required /></label><label>Kata sandi<span class="password-wrap"><input id="auth-page-password" type="password" autocomplete="current-password" minlength="6" placeholder="Minimal 6 karakter" required /><button class="password-toggle" type="button" data-target="auth-page-password">Lihat</button></span></label><button id="auth-page-reset" class="auth-reset" type="button" hidden>Lupa kata sandi?</button><button id="auth-page-submit" class="btn brand" type="submit">Masuk ke dashboard</button><p id="auth-page-message" class="auth-page-message" role="status"></p></form><p class="auth-switch">Belum punya akun? <a href="register.html">Buat akun gratis</a></p></section>
+  </main>
+  <script type="module" src="auth-pages.js"></script>
+</body>
+</html>

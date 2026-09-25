@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Tugas & Misi - BAEUDA</title><link rel="stylesheet" href="styles.css" /></head>
+<body class="focus-page auth-pending">
+  <header class="focus-topbar"><a class="focus-brand" href="dashboard.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a><a class="small-btn" href="features.html">← Semua fitur</a></header>
+  <main class="focus-main">
+    <section class="focus-heading"><div><p class="eyebrow">Tetap konsisten</p><h1>Tugas & misi.</h1><p>Pecah target besar menjadi beberapa langkah yang bisa kamu selesaikan hari ini.</p></div></section>
+    <section class="focus-card"><h2>Daftar langkahmu</h2><p>Centang satu per satu. Daftar ini tersimpan khusus untuk akunmu.</p><div class="focus-list" id="task-list"></div><form class="focus-form" id="task-form"><input id="task-input" maxlength="70" placeholder="Contoh: ulangi rumus energi" required /><button class="btn brand" type="submit">Tambah tugas</button></form></section>
+  </main>
+  <script type="module">
+    import { requireAuth } from './auth-guard.js';
+    requireAuth(user => {
+      const key = `baeudaTasks:${user.uid}`;
+      const defaults = [{ text: 'Selesaikan satu mini game', done: false }, { text: 'Belajar selama 25 menit', done: false }, { text: 'Baca satu materi baru', done: false }];
+      const read = () => { try { return JSON.parse(localStorage.getItem(key)) || defaults; } catch { return defaults; } };
+      const save = tasks => localStorage.setItem(key, JSON.stringify(tasks));
+      const render = () => { document.getElementById('task-list').innerHTML = read().map((task, index) => `<label class="task-row ${task.done ? 'done' : ''}"><input type="checkbox" data-index="${index}" ${task.done ? 'checked' : ''} /><span>${task.done ? '✅' : '⬜'}</span><strong>${task.text}</strong></label>`).join(''); document.querySelectorAll('[data-index]').forEach(input => input.addEventListener('change', () => { const tasks = read(); tasks[Number(input.dataset.index)].done = input.checked; save(tasks); render(); })); };
+      render();
+      document.getElementById('task-form').addEventListener('submit', event => { event.preventDefault(); const input = document.getElementById('task-input'); const tasks = read(); tasks.push({ text: input.value.trim(), done: false }); save(tasks); input.value = ''; render(); });
+    });
+  </script>
+</body>
+</html>

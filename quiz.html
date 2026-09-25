@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuis Fisika — BAEUDA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-pending">
+  <header class="header">
+    <div class="container nav">
+      <div class="brand">
+        <img src="logo.png" alt="Logo BAEUDA" class="logo" />
+        <h1>BAEUDA</h1>
+      </div>
+      <nav class="navlinks">
+        <a href="index.html" class="btn ghost">Beranda</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container" style="max-width:700px;margin:40px auto;">
+    <div class="card" style="padding:2em;">
+      <div class="badge">Kuis Fisika</div>
+      <h3 style="margin-bottom:1.5em;">⚡ Kuis IPA Fisika — 10 Pertanyaan</h3>
+      <div id="quiz-area">
+        <div id="quiz-question" style="font-size:1.2em;font-weight:500;margin-bottom:1em;"></div>
+        <div id="quiz-options"></div>
+        <div id="quiz-feedback" style="margin-top:1em;color:var(--muted);min-height:2em;"></div>
+        <button class="btn brand" id="quiz-next" style="display:none;margin-top:1.5em;">Pertanyaan Berikutnya</button>
+        <div id="quiz-score" style="margin-top:1.5em;font-weight:bold;"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="container">© <span id="y"></span> BAEUDA</div>
+  </footer>
+  <script>
+    const STORAGE_KEY = localStorage.getItem('baeudaActiveProfileKey') || 'baeudaProfile';
+
+    function loadProfile() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : null;
+    }
+
+    function saveProfile(profile) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      window.dispatchEvent(new CustomEvent('baeuda-profile-updated', { detail: profile }));
+    }
+
+    function addQuizXP(amount) {
+      const defaultStats = [
+        { label: 'Permainan dimainkan', value: 0 },
+        { label: 'Tantangan selesai', value: 0 },
+        { label: 'XP didapat', value: 0 }
+      ];
+      const profile = loadProfile() || { xp: 0, level: 1, stats: defaultStats };
+      profile.xp = Number(profile.xp || 0) + amount;
+      profile.stats = Array.isArray(profile.stats) ? profile.stats : defaultStats;
+      if (!profile.stats[0]) profile.stats[0] = defaultStats[0];
+      if (!profile.stats[1]) profile.stats[1] = defaultStats[1];
+      if (!profile.stats[2]) profile.stats[2] = defaultStats[2];
+      profile.stats[0].value = Number(profile.stats[0].value || 0) + 1;
+      profile.stats[2].value = Number(profile.stats[2].value || 0) + amount;
+      profile.level = Math.max(1, Math.ceil(profile.xp / 100));
+      saveProfile(profile);
+    }
+
+    const quizQuestions = [
+      { level: 'Easy', q: 'Sebuah toko memberikan diskon 20% untuk sebuah tas yang semula berharga Rp350.000,00. Harga yang harus dibayar setelah mendapatkan diskon adalah ...', options: ['Rp260.000,00', 'Rp270.000,00', 'Rp280.000,00', 'Rp290.000,00', 'Rp300.000,00'], answer: 2, explain: 'Diskon = 20% × Rp350.000,00 = Rp70.000,00. Harga setelah diskon = Rp350.000,00 - Rp70.000,00 = Rp280.000,00.', type: 'mc' },
+      { level: 'Easy', q: 'Sebuah buah kelapa dengan massa 2 kg tergantung di atas pohon pada ketinggian 5 meter dari permukaan tanah. Jika percepatan gravitasi bumi adalah 10 m/s², berapakah energi potensial buah kelapa tersebut?', options: ['100 joule', '50 joule', '150 joule', '200 joule'], answer: 0, explain: 'Energi potensial dihitung dengan rumus Ep = m × g × h = 2 × 10 × 5 = 100 joule.', type: 'mc' },
+      { level: 'Easy', q: 'Sebuah kawat penghantar mengalirkan arus listrik sebesar 2 ampere selama 10 sekon. Berapa besar muatan listrik yang mengalir?', options: ['5 coulomb', '20 coulomb', '10 coulomb', '40 coulomb'], answer: 1, explain: 'Muatan listrik dihitung dengan rumus q = I × t = 2 A × 10 s = 20 coulomb.', type: 'mc' },
+      { level: 'Medium', q: 'Termometer skala X menunjukkan -20°X saat es mencair dan 100°X saat air mendidih. Jika suhu benda 50°C, berapakah suhu yang ditunjukkan termometer X?', options: ['30°X', '40°X', '50°X', '60°X'], answer: 1, explain: 'Rentang X adalah 120 dan rentang Celsius adalah 100. (X + 20) / 120 = 50 / 100, sehingga X + 20 = 60 dan X = 40°X.', type: 'mc' },
+      { level: 'Medium', q: 'Santi memasukkan batu bermassa 200 gram ke dalam gelas ukur. Volume air mula-mula 50 mL dan menjadi 100 mL setelah batu dicelupkan seluruhnya. Berapakah massa jenis batu?', options: ['4 g/cm³', '2 g/cm³', '5 g/cm³', '10 g/cm³'], answer: 0, explain: 'Volume batu = 100 mL - 50 mL = 50 cm³. Massa jenis = massa / volume = 200 g / 50 cm³ = 4 g/cm³.', type: 'mc' },
+      { level: 'Medium', q: 'Diameter pipa diukur dengan jangka sorong. Skala utama 2,1 cm, skala nonius 4, dan ketelitiannya 0,01 cm. Berapakah hasil pengukurannya?', options: ['2,14 mm', '2,14 cm', '2,41 cm', '2,04 cm'], answer: 1, explain: 'Hasil pengukuran = skala utama + (skala nonius × ketelitian) = 2,1 cm + (4 × 0,01 cm) = 2,14 cm.', type: 'mc' },
+      { level: 'Medium', q: 'Transformator ideal memiliki Np = 200 lilitan dan Ns = 800 lilitan. Jika tegangan primer 50 volt, berapakah tegangan sekundernya?', options: ['100 volt', '12,5 volt', '400 volt', '200 volt'], answer: 3, explain: 'Vs / Vp = Ns / Np, maka Vs = 50 × (800 / 200) = 200 volt.', type: 'mc' },
+      { level: 'Hard', q: 'Balok kayu bermassa 300 gram dan bervolume 500 cm³ terapung di air dengan massa jenis 1 g/cm³. Berapa persentase volume balok yang berada di atas permukaan air?', options: ['20%', '30%', '40%', '60%'], answer: 2, explain: 'Volume tercelup = m / ρair = 300 / 1 = 300 cm³. Volume di atas air = 500 - 300 = 200 cm³, sehingga persentasenya = 200 / 500 × 100% = 40%.', type: 'mc' },
+      { level: 'Hard', q: 'Mobil A bergerak dari P ke Q dengan kelajuan 60 km/jam. Setengah jam kemudian, mobil B bergerak dari Q ke P dengan kelajuan 90 km/jam. Jika jarak P-Q 210 km, berapa waktu yang diperlukan B hingga berpapasan dengan A?', options: ['1,0 jam', '1,2 jam', '1,4 jam', '1,5 jam'], answer: 1, explain: 'Sebelum B berangkat, A menempuh 0,5 × 60 = 30 km. Jarak tersisa 180 km, jadi waktu berpapasan = 180 / (60 + 90) = 1,2 jam.', type: 'mc' },
+      { level: 'Hard', q: 'Empat resistor masing-masing 6 Ω disusun membentuk jembatan simetris dengan satu resistor 6 Ω di tengah diagonal. Jika dihubungkan ke sumber 24 volt, berapakah arus totalnya?', options: ['2 ampere', '3 ampere', '4 ampere', '6 ampere'], answer: 2, explain: 'Pada jembatan simetris, resistor tengah tidak dialiri arus sehingga hambatan pengganti rangkaian adalah 6 Ω. Arus total I = V / R = 24 / 6 = 4 ampere.', type: 'mc' }
+    ];
+    let quizIndex = 0;
+    let quizScore = 0;
+
+    function showQuizQuestion() {
+      const q = quizQuestions[quizIndex];
+      document.getElementById('quiz-question').innerHTML = `<b>Pertanyaan ${quizIndex+1}:</b> ${q.q}`;
+      if(q.type === "essay"){
+        document.getElementById('quiz-options').innerHTML = `<textarea id="essay-answer" class="input" rows="4" placeholder="Tulis jawabanmu di sini..."></textarea><br><button class="btn brand" onclick="checkQuizEssay()">Kirim Jawaban</button>`;
+      } else {
+        const opts = q.options.map((opt, i) =>
+          `<button class="btn full" style="margin:.3em 0;width:100%;text-align:left;" onclick="checkQuizAnswer(${i})">${opt}</button>`
+        ).join("");
+        document.getElementById('quiz-options').innerHTML = opts;
+      }
+      document.getElementById('quiz-feedback').textContent = '';
+      document.getElementById('quiz-next').style.display = 'none';
+      document.getElementById('quiz-score').textContent = `Pertanyaan ${quizIndex+1} dari ${quizQuestions.length}`;
+    }
+
+    window.checkQuizAnswer = function(selected) {
+      const q = quizQuestions[quizIndex];
+      if (selected === q.answer) {
+        document.getElementById('quiz-feedback').innerHTML = `<span style='color:var(--ok)'>Benar! 🎉</span><br><i>${q.explain}</i>`;
+        quizScore++;
+      } else {
+        document.getElementById('quiz-feedback').innerHTML =
+          `<span style='color:var(--danger)'>Salah!</span> <br>Jawaban benar: <b>${q.options[q.answer]}</b><br><i>${q.explain}</i>`;
+      }
+      document.getElementById('quiz-options').innerHTML = '';
+      document.getElementById('quiz-next').style.display = 'inline-block';
+      document.getElementById('quiz-score').textContent = `Skor: ${quizScore} / ${quizQuestions.length}`;
+    };
+
+    function normalizeText(text){
+      return text.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function countKeywords(answer, keywords) {
+      const cleaned = normalizeText(answer);
+      return keywords.reduce((count, keyword) => count + (cleaned.includes(keyword) ? 1 : 0), 0);
+    }
+
+    window.checkQuizEssay = function(){
+      const q = quizQuestions[quizIndex];
+      const userAnswer = normalizeText(document.getElementById('essay-answer').value);
+      const keywords = ['matahari','air','karbon','dioksida','oksigen','glukosa','energi','cahaya'];
+      const matched = countKeywords(userAnswer, keywords);
+      if(matched >= 3){ 
+        document.getElementById('quiz-feedback').innerHTML = `<span style='color:var(--ok)'>Benar! 🎉</span><br><i>${q.explain}</i>`;
+        quizScore++;
+      } else {
+        document.getElementById('quiz-feedback').innerHTML = `<span style='color:var(--danger)'>Salah</span><br>Jawaban benar: <b>${q.answer}</b><br><i>${q.explain}</i>`;
+      }
+      document.getElementById('quiz-options').innerHTML = '';
+      document.getElementById('quiz-next').style.display = 'inline-block';
+      document.getElementById('quiz-score').textContent = `Skor: ${quizScore} / ${quizQuestions.length}`;
+    };
+
+    document.getElementById('quiz-next').onclick = function() {
+      quizIndex++;
+      if (quizIndex < quizQuestions.length) {
+        showQuizQuestion();
+      } else {
+        // Update XP
+          addQuizXP(quizScore * 10);
+        document.getElementById('quiz-area').innerHTML =
+          `<h4>Kuis selesai!</h4>
+          <p>Skor akhir kamu: <b>${quizScore} / ${quizQuestions.length}</b></p>
+          <p>Kamu mendapat ${quizScore * 10} XP!</p>
+          <a href="index.html" class="btn brand" style="margin-top:1em;">Kembali ke Beranda</a>`;
+      }
+    };
+
+    showQuizQuestion();
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => {});</script>
+</body>
+</html>

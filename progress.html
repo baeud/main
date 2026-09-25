@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Progress & Achievement - BAEUDA</title><link rel="stylesheet" href="styles.css" /></head>
+<body class="focus-page auth-pending">
+  <header class="focus-topbar"><a class="focus-brand" href="dashboard.html"><span class="brand-mark">🐻</span><strong>BAEUDA</strong></a><a class="small-btn" href="features.html">← Semua fitur</a></header>
+  <main class="focus-main">
+    <section class="focus-heading"><div><p class="eyebrow">Lihat perjalananmu</p><h1>Progress.</h1><p>Perkembangan kecil yang dikumpulkan setiap hari akan menjadi sesuatu yang besar.</p></div></section>
+    <section class="focus-grid">
+      <div class="focus-card"><div class="focus-icon">⭐</div><h2>XP terkumpul</h2><p id="progress-xp">0 XP</p></div>
+      <div class="focus-card"><div class="focus-icon">🔥</div><h2>Streak belajar</h2><p id="progress-streak">0 hari</p></div>
+      <div class="focus-card"><div class="focus-icon">🏅</div><h2>Level saat ini</h2><p id="progress-level">Level 1</p></div>
+      <div class="focus-card"><div class="focus-icon">🎯</div><h2>Target berikutnya</h2><p id="progress-next">100 XP menuju level berikutnya</p></div>
+    </section>
+    <section class="focus-card" style="margin-top:16px"><h2>Pencapaianmu</h2><ul class="focus-list"><li><span>🏅</span><strong>Pemula Hebat</strong> Profil sudah dibuat</li><li><span>🎮</span><strong>Penjelajah</strong> Mainkan mini game pertamamu</li><li><span>🔥</span><strong>Ritme Belajar</strong> Selesaikan misi selama 3 hari</li></ul></section>
+  </main>
+  <script type="module">
+    import { requireAuth } from './auth-guard.js';
+    requireAuth(user => { const profile = JSON.parse(localStorage.getItem(`baeudaProfile:${user.uid}`) || '{}'); const xp = Number(profile.xp || 0); const level = Math.max(1, Math.ceil(xp / 100)); document.getElementById('progress-xp').textContent = `${xp} XP`; document.getElementById('progress-streak').textContent = `${Number(profile.streak || 0)} hari`; document.getElementById('progress-level').textContent = `Level ${level}`; document.getElementById('progress-next').textContent = `${Math.max(0, level * 100 - xp)} XP menuju level berikutnya`; });
++  </script>
++</body>
++</html>

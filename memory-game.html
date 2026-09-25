@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kartu Memori — BAEUDA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .card-m {
+      background: var(--card);
+      border-radius: 12px;
+      aspect-ratio: 1;
+      display: block;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      perspective: 1100px;
+      transition: transform .45s cubic-bezier(.2,.9,.2,1);
+    }
+
+    .card-m-inner {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transition: transform .45s cubic-bezier(.2,.9,.2,1);
+    }
+
+    .card-m.flipped .card-m-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-front {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      font-size: 2rem;
+      color: var(--muted);
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      position: relative;
+      background: var(--card);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .card-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      padding: 0.45rem 0;
+      font-size: 0.92rem;
+      text-align: center;
+      opacity: 1;
+      transition: opacity .2s ease;
+    }
+
+    .card-m.matched {
+      border-color: var(--brand);
+      box-shadow: 0 10px 30px rgba(78,123,254,.18);
+      transform: scale(1.02);
+    }
+
+    .card-m.matched .card-label { display:block; }
+
+    /* responsive */
+    @media (max-width:720px) {
+      .grid-cards { grid-template-columns: repeat(3,1fr); gap:10px; }
+    }
+    @media (max-width:420px) {
+      .grid-cards { grid-template-columns: repeat(2,1fr); gap:8px; }
+    }
+  </style>
+</head>
+<body class="auth-pending">
+  <main class="container" style="max-width:820px;margin:40px auto;">
+    <div class="card" style="padding:2em;">
+      <div class="badge">Kartu Memori</div>
+      <h3>Temukan Pasangan Ilmuwan Terkenal</h3>
+      <div id="grid" class="grid-cards" style="margin-top:1em;"></div>
+      <div id="mem-status" style="margin-top:1em;color:var(--muted)"></div>
+      <button class="btn" id="mem-restart" style="margin-top:1em;">Mulai Ulang</button>
+    </div>
+  </main>
+
+  <script>
+    const scientists = [
+      { name: "Einstein", img: "logo.png" },
+      { name: "Newton", img: "logo.png" },
+      { name: "Tesla", img: "logo.png" },
+      { name: "Curie", img: "logo.png" },
+      { name: "Darwin", img: "logo.png" },
+      { name: "Hawking", img: "logo.png" },
+      { name: "Galileo", img: "logo.png" },
+      { name: "Bohr", img: "logo.png" }
+    ];
+    let deck = [], first = null, second = null, lock = false, matches = 0;
+
+    // build deck (duplicates + shuffle)
+    function buildDeck() {
+      deck = [...scientists, ...scientists].map((s, i) => ({ ...s, idx: i }));
+      // Fisher–Yates shuffle
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+    }
+
+    function createCardHTML(item, index) {
+      // data-pos maps to current deck index so comparisons use deck[pos].name
+      return `
+        <div class="card-m" data-pos="${index}">
+          <div class="card-m-inner">
+            <div class="card-face card-front">?</div>
+            <div class="card-face card-back">
+              <img data-src="${item.img}" alt="${item.name}">
+              <div class="card-label">${item.name}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function init() {
+      buildDeck();
+      first = null; second = null; lock = false; matches = 0;
+      const grid = document.getElementById('grid');
+      grid.innerHTML = deck.map((d,i) => createCardHTML(d,i)).join('');
+      document.querySelectorAll('#grid .card-m').forEach(el => {
+        el.addEventListener('click', () => flip(el));
+      });
+      document.querySelectorAll('#grid img').forEach(img => {
+        img.src = img.dataset.src;
+        img.onerror = function(){
+          this.onerror = null;
+          this.src = 'logo.png';
+        };
+      });
+      document.getElementById('mem-status').textContent = `Pasangan ditemukan: ${matches}`;
+    }
+
+    function flip(el) {
+      if (lock || el.classList.contains('matched') || el === first) return;
+      el.classList.add('flipped');
+
+      const pos = Number(el.dataset.pos);
+      if (!first) {
+        first = el;
+      } else {
+        second = el;
+        lock = true;
+        const a = deck[Number(first.dataset.pos)].name;
+        const b = deck[pos].name;
+        if (a === b) {
+          // match
+          first.classList.add('matched');
+          second.classList.add('matched');
+          matches++;
+          resetTurn();
+          if (matches === scientists.length) {
+            document.getElementById('mem-status').textContent = "Selesai! Kamu telah menemukan semua pasangan ilmuwan!";
+          }
+        } else {
+          // not a match -> flip back
+          setTimeout(() => {
+            first.classList.remove('flipped');
+            second.classList.remove('flipped');
+            resetTurn();
+          }, 900);
+        }
+        document.getElementById('mem-status').textContent = `Pasangan ditemukan: ${matches}`;
+      }
+    }
+
+    function resetTurn(){
+      first = null; second = null; lock = false;
+    }
+
+    document.getElementById('mem-restart').addEventListener('click', init);
+
+    // init on load
+    init();
+  </script>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => {});</script>
+</body>
+</html>

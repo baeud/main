@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tebak Kata — BAEUDA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-pending">
+  <main class="container" style="max-width:700px;margin:40px auto;">
+    <div class="card" style="padding:2em;">
+      <div class="badge">Tebak Kata</div>
+      <h3>Tebak kata (5 kesempatan)</h3>
+      <div style="display:flex;gap:.75em;flex-wrap:wrap;align-items:center;margin-bottom:1em;">
+        <button class="btn" id="hint-btn" style="padding:.5em .8em;">Tampilkan Petunjuk</button>
+        <div id="hint" style="color:var(--muted);font-size:.95rem;"></div>
+      </div>
+      <div id="word-area" style="font-size:1.4rem;letter-spacing:.2em;margin:1em 0;"></div>
+      <div id="letters" style="display:flex;flex-wrap:wrap;gap:.5em;"></div>
+      <div id="status" style="margin-top:1em;"></div>
+      <button class="btn" id="restart" style="margin-top:1em;display:none;">Main Lagi</button>
+    </div>
+  </main>
+
+  <script>
+    const words = ["ALGORITMA","FISIKA","ENERGI","GAYA","KECEPATAN","KALISIM","VAKUM","GRAVITASI"];
+    const hints = {
+      ALGORITMA: "Urutan langkah untuk menyelesaikan masalah atau membuat program.",
+      FISIKA: "Ilmu tentang gaya, energi, dan gerakan.",
+      ENERGI: "Kemampuan untuk melakukan kerja atau menyebabkan perubahan.",
+      GAYA: "Dorongan atau tarikan yang dapat mengubah gerak benda.",
+      KECEPATAN: "Jarak yang ditempuh dibagi waktu.",
+      KALISIM: "Istilah untuk persamaan dengan nilai tak tentu, sering disebut sistem linier.",
+      VAKUM: "Ruang kosong yang hampir tidak memiliki partikel.",
+      GRAVITASI: "Gaya tarik antara dua benda yang bermassa."
+    };
+    let answer, revealed, tries;
+    function start(){
+      answer = words[Math.floor(Math.random()*words.length)];
+      revealed = Array(answer.length).fill(false);
+      tries = 5;
+      render();
+      document.getElementById('restart').style.display='none';
+      document.getElementById('status').textContent = `Kesempatan: ${tries}`;
+      document.getElementById('hint').textContent = '';
+      document.getElementById('hint-btn').disabled = false;
+    }
+    function render(){
+      document.getElementById('word-area').textContent = revealed.map((v,i)=> v?answer[i]:'_').join(' ');
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+      document.getElementById('letters').innerHTML = letters.map(l=>`<button class="btn" style="padding:.4em .6em" onclick="guess('${l}')" id="let-${l}">${l}</button>`).join('');
+    }
+    window.guess = function(ch){
+      if(tries<=0) return;
+      let hit=false;
+      for(let i=0;i<answer.length;i++){
+        if(answer[i]===ch){ revealed[i]=true; hit=true; }
+      }
+      if(!hit){ tries--; document.getElementById('status').textContent = `Kesempatan: ${tries}`; }
+      document.getElementById('let-'+ch).disabled = true;
+      renderWordState();
+    };
+
+    window.showHint = function(){
+      const hintEl = document.getElementById('hint');
+      hintEl.textContent = `Petunjuk: ${hints[answer]}`;
+      document.getElementById('hint-btn').disabled = true;
+      const unrevealed = revealed
+        .map((v,i)=> v ? null : i)
+        .filter(i => i !== null);
+      if(unrevealed.length){
+        const randomIndex = unrevealed[Math.floor(Math.random()*unrevealed.length)];
+        revealed[randomIndex] = true;
+        render();
+      }
+    };
+
+    function renderWordState(){
+      document.getElementById('word-area').textContent = revealed.map((v,i)=> v?answer[i]:'_').join(' ');
+      if(revealed.every(Boolean)){
+        document.getElementById('status').innerHTML = `<span style="color:var(--ok)">Kamu menang! Kata: ${answer}</span>`;
+        endGame();
+      } else if(tries<=0){
+        document.getElementById('status').innerHTML = `<span style="color:var(--danger)">Kamu kalah. Kata: ${answer}</span>`;
+        endGame();
+      }
+    }
+    function endGame(){ document.getElementById('restart').style.display='inline-block'; document.querySelectorAll('#letters button').forEach(b=>b.disabled=true); document.getElementById('hint-btn').disabled = true; }
+    document.getElementById('restart').onclick = start;
+    document.getElementById('hint-btn').onclick = showHint;
+    start();
+  </script>
+  <script type="module">import { requireAuth } from './auth-guard.js'; requireAuth(() => {});</script>
+</body>
+</html>
